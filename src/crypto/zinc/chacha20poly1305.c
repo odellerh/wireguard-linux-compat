@@ -21,6 +21,7 @@
 static const u8 pad0[CHACHA20_BLOCK_SIZE] = { 0 };
 
 static inline void
+// odell: modify cipher used-> 1st try: edit chacha20.c to modify rounds from 20 to 8
 __chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
 			   const u8 *ad, const size_t ad_len, const u64 nonce,
 			   const u8 key[CHACHA20POLY1305_KEY_SIZE],

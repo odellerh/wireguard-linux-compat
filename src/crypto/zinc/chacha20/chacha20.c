@@ -67,18 +67,18 @@ static inline bool hchacha20_arch(u32 derived_key[CHACHA20_KEY_WORDS],
 	QUARTER_ROUND(x, C(0, 2), C(1, 3), C(2, 0), C(3, 1)), \
 	QUARTER_ROUND(x, C(0, 3), C(1, 0), C(2, 1), C(3, 2)) \
 )
-
+// odell: change this to 8 rounds from 20 rounds to modify encryption -> testing against prebuild wg should not work after this modification
 #define TWENTY_ROUNDS(x) ( \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
+	DOUBLE_ROUND(x)/*, \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
-	DOUBLE_ROUND(x), \
-	DOUBLE_ROUND(x) \
+	DOUBLE_ROUND(x) \*/
 )
 
 static void chacha20_block_generic(struct chacha20_ctx *ctx, __le32 *stream)
