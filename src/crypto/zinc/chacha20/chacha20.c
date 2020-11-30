@@ -72,7 +72,7 @@ static inline bool hchacha20_arch(u32 derived_key[CHACHA20_KEY_WORDS],
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
-	DOUBLE_ROUND(x)/*, \
+	DOUBLE_ROUND(x)\/*, \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
