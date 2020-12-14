@@ -72,6 +72,12 @@ static inline bool hchacha20_arch(u32 derived_key[CHACHA20_KEY_WORDS],
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x), \
+	DOUBLE_ROUND(x), \
+	DOUBLE_ROUND(x), \
+	DOUBLE_ROUND(x), \
+	DOUBLE_ROUND(x), \
+	DOUBLE_ROUND(x), \
+	DOUBLE_ROUND(x), \
 	DOUBLE_ROUND(x) \
 )
 
@@ -83,7 +89,7 @@ static void chacha20_block_generic(struct chacha20_ctx *ctx, __le32 *stream)
 	for (i = 0; i < ARRAY_SIZE(x); ++i)
 		x[i] = ctx->state[i];
 
-	TWENTY_ROUNDS(x);
+	TWENTY_ROUNDS(X);
 
 	for (i = 0; i < ARRAY_SIZE(x); ++i)
 		stream[i] = cpu_to_le32(x[i] + ctx->state[i]);

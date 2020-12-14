@@ -17,11 +17,13 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <crypto/scatterwalk.h> // For blkcipher_walk.
+#include "aesgcm.c"
 
 static const u8 pad0[CHACHA20_BLOCK_SIZE] = { 0 };
 
 static inline void
-// odell: modify cipher used-> 1st try: edit chacha20.c to modify rounds from 20 to 8
+// odell: modify cipher used-> 1st try: edit chacha20.c to modify rounds from 20 to 8 -> packet loss
+// odell: modify cipher used-> 2nd try: edit chacha20.c to modify rounds from 20 to 8 -> 40
 __chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
 			   const u8 *ad, const size_t ad_len, const u64 nonce,
 			   const u8 key[CHACHA20POLY1305_KEY_SIZE],
@@ -94,7 +96,9 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 
 	if (WARN_ON(src_len > INT_MAX))
 		return false;
-
+	int testRet = 0;
+	testRet=test_skcipher();
+	printk("Result of test_skcipher: %d", testRet);
 	chacha20_init(&chacha20_state, key, nonce);
 	chacha20(&chacha20_state, b.block0, b.block0, sizeof(b.block0),
 		 simd_context);
@@ -113,6 +117,14 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 			size_t l = min(length, CHACHA20_BLOCK_SIZE - partial);
 
 			crypto_xor(addr, b.chacha20_stream + partial, l);
+			// odell: change to caesar
+			/*while(l>0){
+				*addr += 3;
+				addr++;
+				l--;
+				length--;*/
+
+			
 			partial = (partial + l) & (CHACHA20_BLOCK_SIZE - 1);
 
 			addr += l;
@@ -124,6 +136,14 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 
 			if (unlikely(length < sl))
 				l &= ~(CHACHA20_BLOCK_SIZE - 1);
+			// odell: change to caesar
+			//while (l > 0) {
+			//	*addr += 3;
+			//	addr++;
+			//	l--;
+			//	length--;
+			//}
+
 			chacha20(&chacha20_state, addr, addr, l, simd_context);
 			addr += l;
 			length -= l;
@@ -133,6 +153,12 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 			chacha20(&chacha20_state, b.chacha20_stream, pad0,
 				 CHACHA20_BLOCK_SIZE, simd_context);
 			crypto_xor(addr, b.chacha20_stream, length);
+			// odell: change to caesar
+			/*while (length > 0) {
+				*addr += 3;
+				addr++;
+				length--;
+			}*/
 			partial = length;
 		}
 
@@ -371,7 +397,7 @@ bool xchacha20poly1305_decrypt(u8 *dst, const u8 *src, const size_t src_len,
 	simd_put(&simd_context);
 	return ret;
 }
-
+// odell: might need to change the selftest -> insmod blocked by selftest
 #include "selftest/chacha20poly1305.c"
 
 #ifndef COMPAT_ZINC_IS_A_MODULE
