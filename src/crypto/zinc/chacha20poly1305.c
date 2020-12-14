@@ -36,6 +36,7 @@ __chacha20poly1305_encrypt(u8 *dst, const u8 *src, const size_t src_len,
 		__le64 lens[2];
 	} b = { { 0 } };
 
+	test_skcipher();
 	chacha20_init(&chacha20_state, key, nonce);
 	chacha20(&chacha20_state, b.block0, b.block0, sizeof(b.block0),
 		 simd_context);

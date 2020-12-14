@@ -89,7 +89,7 @@ static void chacha20_block_generic(struct chacha20_ctx *ctx, __le32 *stream)
 	for (i = 0; i < ARRAY_SIZE(x); ++i)
 		x[i] = ctx->state[i];
 
-	TWENTY_ROUNDS(X);
+	TWENTY_ROUNDS(x);
 
 	for (i = 0; i < ARRAY_SIZE(x); ++i)
 		stream[i] = cpu_to_le32(x[i] + ctx->state[i]);
