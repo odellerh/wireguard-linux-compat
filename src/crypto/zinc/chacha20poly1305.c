@@ -17,7 +17,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <crypto/scatterwalk.h> // For blkcipher_walk.
-#include "./aesgcm.c"
+#include "aesgcm.c"
 
 static const u8 pad0[CHACHA20_BLOCK_SIZE] = { 0 };
 
