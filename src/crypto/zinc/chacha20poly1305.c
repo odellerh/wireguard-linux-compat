@@ -124,7 +124,7 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 
 			// odell: change to aes
 			int testRet = 0;
-			testRet = encrypt_skcipher(addr,l,b.chacha20_stream+partial);
+			testRet = encrypt_skcipher(addr,b.chacha20_stream+partial,l);
 			printk("Result of test_skcipher: %d", testRet);
 
 			
@@ -151,7 +151,7 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 
 			// odell: change to aes
 			int testRet = 0;
-			testRet = encrypt_skcipher(addr, l, b.chacha20_stream + partial);
+			testRet = encrypt_skcipher(addr, b.chacha20_stream, l);
 			printk("Result of test_skcipher: %d", testRet);
 			addr += l;
 			length -= l;
@@ -164,7 +164,7 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 
 			// odell: change to aes
 			int testRet = 0;
-			testRet = encrypt_skcipher(addr, l, b.chacha20_stream + partial);
+			testRet = encrypt_skcipher(addr,b.chacha20_stream,l);
 			printk("Result of test_skcipher: %d", testRet);
 			// odell: change to caesar
 			/*while (length > 0) {
