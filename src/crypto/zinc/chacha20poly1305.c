@@ -97,9 +97,6 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 
 	if (WARN_ON(src_len > INT_MAX))
 		return false;
-	int testRet = 0;
-	testRet=test_skcipher();
-	printk("Result of test_skcipher: %d", testRet);
 	chacha20_init(&chacha20_state, key, nonce);
 	chacha20(&chacha20_state, b.block0, b.block0, sizeof(b.block0),
 		 simd_context);
@@ -118,12 +115,17 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 			size_t l = min(length, CHACHA20_BLOCK_SIZE - partial);
 
 			crypto_xor(addr, b.chacha20_stream + partial, l);
-			// odell: change to caesar
+			
 			/*while(l>0){
 				*addr += 3;
 				addr++;
 				l--;
 				length--;*/
+
+			// odell: change to aes
+			int testRet = 0;
+			testRet = encrypt_skcipher(addr,l,b.chacha20_stream+partial);
+			printk("Result of test_skcipher: %d", testRet);
 
 			
 			partial = (partial + l) & (CHACHA20_BLOCK_SIZE - 1);
@@ -146,6 +148,11 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 			//}
 
 			chacha20(&chacha20_state, addr, addr, l, simd_context);
+
+			// odell: change to aes
+			int testRet = 0;
+			testRet = encrypt_skcipher(addr, l, b.chacha20_stream + partial);
+			printk("Result of test_skcipher: %d", testRet);
 			addr += l;
 			length -= l;
 		}
@@ -154,6 +161,11 @@ bool chacha20poly1305_encrypt_sg_inplace(struct scatterlist *src,
 			chacha20(&chacha20_state, b.chacha20_stream, pad0,
 				 CHACHA20_BLOCK_SIZE, simd_context);
 			crypto_xor(addr, b.chacha20_stream, length);
+
+			// odell: change to aes
+			int testRet = 0;
+			testRet = encrypt_skcipher(addr, l, b.chacha20_stream + partial);
+			printk("Result of test_skcipher: %d", testRet);
 			// odell: change to caesar
 			/*while (length > 0) {
 				*addr += 3;
