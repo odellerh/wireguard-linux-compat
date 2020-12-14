@@ -6,16 +6,26 @@
 #include <crypto/skcipher.h>
 #include <crypto/scatterwalk.h> 
 
-static int test_skcipher(void)
+//enum chacha20poly1305_lengths {
+//	XCHACHA20POLY1305_NONCE_SIZE = 24,
+//	CHACHA20POLY1305_KEY_SIZE = 32,
+//	CHACHA20POLY1305_AUTHTAG_SIZE = 16
+//};
+
+static int encrypt_skcipher(struct scatterlist *src,
+	const size_t src_len,
+	const u8 *ad, const size_t ad_len,
+	const u64 nonce,
+	const u8 key[CHACHA20POLY1305_KEY_SIZE],
+	simd_context_t *simd_context)
 {
 	struct crypto_skcipher *tfm = NULL;
 	struct skcipher_request *req = NULL;
 	u8 *data = NULL;
 	const size_t datasize = 512; /* data size in bytes */
-	struct scatterlist sg;
 	DECLARE_CRYPTO_WAIT(wait);
-	u8 iv[16];  /* AES-256-XTS takes a 16-byte IV */
-	u8 key[64]; /* AES-256-XTS takes a 64-byte key */
+	u8 iv[16];  /* AES-256-XTS takes a 16-byte IV */ //TODO
+	//u8 key[64]; /* AES-256-XTS takes a 64-byte key */
 	int err;
 
 	/*
@@ -32,7 +42,7 @@ static int test_skcipher(void)
 		return PTR_ERR(tfm);
 	}
 
-	get_random_bytes(key, sizeof(key));
+	//get_random_bytes(key, sizeof(key));
 	err = crypto_skcipher_setkey(tfm, key, sizeof(key));
 	if (err) {
 		pr_err("Error setting key: %d\n", err);
@@ -52,10 +62,10 @@ static int test_skcipher(void)
 		err = -ENOMEM;
 		goto out;
 	}
-	get_random_bytes(data, datasize);
+	//get_random_bytes(data, datasize);
 
 	/* Initialize the IV */
-	get_random_bytes(iv, sizeof(iv));
+	get_random_bytes(iv, sizeof(iv)); //TODO: using random iv for now
 
 	/*
 	 * Encrypt the data in-place.
@@ -66,18 +76,18 @@ static int test_skcipher(void)
 	 * To decrypt instead of encrypt, just change crypto_skcipher_encrypt() to
 	 * crypto_skcipher_decrypt().
 	 */
-	sg_init_one(&sg, data, datasize);
+	//sg_init_one(&sg, data, datasize);
 	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
 		CRYPTO_TFM_REQ_MAY_SLEEP,
 		crypto_req_done, &wait);
-	skcipher_request_set_crypt(req, &sg, &sg, datasize, iv);
+	skcipher_request_set_crypt(req, src, src, src_len, iv);
 	err = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
 	if (err) {
 		pr_err("Error encrypting data: %d\n", err);
 		goto out;
 	}
 
-	pr_debug("Encryption was successful\n");
+	printk("%s","Encryption was successful\n");
 out:
 	crypto_free_skcipher(tfm);
 	skcipher_request_free(req);
