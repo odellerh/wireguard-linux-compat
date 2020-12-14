@@ -2,6 +2,8 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#include <crypto/aead.h>
+#include <crypto/skcipher.h>
 #include <crypto/scatterwalk.h> 
 
 static int test_skcipher(void)
